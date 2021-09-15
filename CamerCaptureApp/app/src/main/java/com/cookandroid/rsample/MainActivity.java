@@ -2,14 +2,22 @@ package com.cookandroid.rsample;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -32,11 +40,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
+    static File imageFile;
+    static Uri fileUri;
 
     private void takePicture(){
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if(takePictureIntent.resolveActivity(getPackageManager()) != null){
-            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+            try {
+                imageFile = createFile();
+                fileUri = FileProvider.getUriForFile(this, "com.cookandroid.rsample", imageFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,fileUri);
+                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+            } catch(IOException e){
+                e.printStackTrace();
+            };
         }
     }
 
@@ -49,5 +66,14 @@ public class MainActivity extends AppCompatActivity {
             Bitmap imageBitmap = (Bitmap) extras.get("data");
             imageView.setImageBitmap(imageBitmap);
         }
+    }
+
+    static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
+    private File createFile() throws IOException {
+        return File.createTempFile(
+                simpleDateFormat.format(new Date()),
+                ".jpg",
+                getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        );
     }
 }
