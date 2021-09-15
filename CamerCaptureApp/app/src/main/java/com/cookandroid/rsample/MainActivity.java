@@ -6,6 +6,7 @@ import androidx.core.content.FileProvider;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -62,8 +63,13 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if(requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK){
-            Bundle extras = data.getExtras(); // Bundle 객체가 Intent 사이에 정보를 주고받을 수 있는 하나의 방법
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
+//            Bundle extras = data.getExtras(); // Bundle 객체가 Intent 사이에 정보를 주고받을 수 있는 하나의 방법
+//            Bitmap imageBitmap = (Bitmap) extras.get("data");
+//            imageView.setImageBitmap(imageBitmap);
+
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inSampleSize = 8; // 1/8로 축소한 이미지
+            Bitmap imageBitmap = BitmapFactory.decodeFile(imageFile.getAbsolutePath(), options);
             imageView.setImageBitmap(imageBitmap);
         }
     }
